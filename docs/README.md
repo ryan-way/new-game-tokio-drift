@@ -18,7 +18,19 @@ I've also decided on prinicple that projects that require a lot of processing ti
 
 ## Project Structure (Tenative)
 
-![diagram](./README-1.svg)
+```mermaid
+graph TD;
+    tui-->algorithms;
+    tui-->storage;
+    tui-->game;
+    tui-->models;
+    sim-->algorithms;
+    sim-->storage;
+    sim-->game;
+    sim-->models;
+    ml-->storage;
+    ml-->models;
+```
 
 - **tui** _(Binary)_: the front end that will be used to run games in tui form
 
