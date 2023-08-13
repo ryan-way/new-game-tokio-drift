@@ -16,7 +16,7 @@ use views::{TicTacToeView, View};
 
 fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<()> {
     let mut tictactoe = TicTacToeView::default();
-    Ok(loop {
+    loop {
         terminal.draw(|f| {
             tictactoe.draw(f);
         })?;
@@ -29,7 +29,8 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<()> {
                 }
             }
         }
-    })
+    }
+    Ok(())
 }
 
 fn setup_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>> {

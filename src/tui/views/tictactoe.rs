@@ -8,19 +8,19 @@ use ratatui::{
 use crate::viewmodels::{TicTacToeViewModel, Token};
 use crate::views::View;
 
-static O: &'static str = "     
+static O: &str = "     
  ███ 
  █ █ 
  ███ 
      ";
 
-static X: &'static str = "     
+static X: &str = "     
  █ █ 
   █  
  █ █ 
      ";
 
-static EMPTY: &'static str = "";
+static EMPTY: &str = "";
 
 pub struct TicTacToeView {
     view_model: TicTacToeViewModel,
@@ -54,7 +54,7 @@ impl TicTacToeView {
     fn tokens_to_row(&self, tokens: &[Token; 3], row_idx: usize) -> Row {
         Row::new(
             tokens
-                .into_iter()
+                .iter()
                 .enumerate()
                 .map(|(cell_idx, token)| self.token_to_cell(token, cell_idx + row_idx))
                 .collect::<Vec<Cell>>(),
@@ -68,7 +68,7 @@ impl<'a> View<'a, Table<'a>> for TicTacToeView {
         Table::new(
             self.view_model
                 .board()
-                .into_iter()
+                .iter()
                 .enumerate()
                 .map(|(idx, row)| self.tokens_to_row(row, idx))
                 .collect::<Vec<Row>>(),
