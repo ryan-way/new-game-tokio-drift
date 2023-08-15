@@ -12,8 +12,8 @@ pub struct Game {
     pub current_token: Token,
 }
 
-impl Game {
-    pub fn default() -> Self {
+impl Default for Game {
+    fn default() -> Self {
         Self {
             board: [
                 [Token::Empty, Token::Empty, Token::Empty],
@@ -23,7 +23,9 @@ impl Game {
             current_token: Token::X,
         }
     }
+}
 
+impl Game {
     pub fn reset(&mut self) {
         for y in 0..3 {
             for x in 0..3 {

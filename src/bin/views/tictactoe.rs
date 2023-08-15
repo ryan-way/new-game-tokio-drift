@@ -112,35 +112,37 @@ impl<'a> View<'a> {
     }
 
     pub fn draw(&self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) {
-        terminal.draw(|f| {
-            let block = Block::default()
-                .title(Span::styled(
-                    self.get_title(),
-                    Style::default().add_modifier(Modifier::BOLD),
-                ))
-                .title_alignment(Alignment::Center)
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .border_style(Style::default().fg(Color::White));
-            f.render_widget(block, f.size());
+        terminal
+            .draw(|f| {
+                let block = Block::default()
+                    .title(Span::styled(
+                        self.get_title(),
+                        Style::default().add_modifier(Modifier::BOLD),
+                    ))
+                    .title_alignment(Alignment::Center)
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded)
+                    .border_style(Style::default().fg(Color::White));
+                f.render_widget(block, f.size());
 
-            let size = self.get_rect(&f.size());
-            let table = Table::new(
-                self.view_model
-                    .board()
-                    .iter()
-                    .enumerate()
-                    .map(|(idx, row)| self.tokens_to_row(row, idx))
-                    .collect::<Vec<Row>>(),
-            )
-            .column_spacing(0)
-            .widths(&[
-                Constraint::Length(5),
-                Constraint::Length(5),
-                Constraint::Length(5),
-            ]);
+                let size = self.get_rect(&f.size());
+                let table = Table::new(
+                    self.view_model
+                        .board()
+                        .iter()
+                        .enumerate()
+                        .map(|(idx, row)| self.tokens_to_row(row, idx))
+                        .collect::<Vec<Row>>(),
+                )
+                .column_spacing(0)
+                .widths(&[
+                    Constraint::Length(5),
+                    Constraint::Length(5),
+                    Constraint::Length(5),
+                ]);
 
-            f.render_widget(table, size);
-        });
+                f.render_widget(table, size);
+            })
+            .unwrap();
     }
 }

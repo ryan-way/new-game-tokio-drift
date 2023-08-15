@@ -28,7 +28,7 @@ impl<'a> IViewModel for ViewModel<'a> {
     }
 
     fn board(&self) -> &Board {
-        &self.model.board()
+        self.model.board()
     }
 }
 
