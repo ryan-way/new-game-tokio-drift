@@ -8,9 +8,13 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.72"
 crossterm = "0.26.1"
+log = "0.4.20"
 rand = "0.8.5"
 ratatui = { version = "0.22.0", features = ["all-widgets"] }
+simple_logger = "4.2.0"
+syslog = "6.1.0"
+tui-logger = { version = "0.9.4", features = ["ratatui-support"] }
 
-[[bin]]
-name="tui"
-path="src/tui/main.rs"
+# [[bin]]
+# name="tui"
+# path="src/tui/main.rs"
