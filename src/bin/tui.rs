@@ -1,4 +1,5 @@
 extern crate log;
+extern crate sea_orm;
 extern crate tui_logger;
 
 mod models;
@@ -14,6 +15,7 @@ use crossterm::{
 };
 use models::MainModel;
 use ratatui::{backend::CrosstermBackend, Terminal};
+use services::db::initialize_db;
 use services::log::intialize_logger;
 use std::{
     io::{self, Stdout},
@@ -22,7 +24,8 @@ use std::{
 use viewmodels::MainViewModel;
 use views::MainView;
 
-fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<(), &'static str> {
+async fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<()> {
+    initialize_db().await.unwrap();
     let mut show_logs = false;
     let logger_view = views::logger::View::default();
     let mut main_model = MainModel::default();
@@ -35,8 +38,8 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<(), &'static
             main_view.draw(terminal);
         }
 
-        if event::poll(Duration::from_millis(250)).or(Err("Couldn't poll"))? {
-            if let Event::Key(key) = event::read().or(Err("Couldn't read key"))? {
+        if event::poll(Duration::from_millis(250))? {
+            if let Event::Key(key) = event::read()? {
                 if KeyCode::Char('l') == key.code {
                     show_logs = !show_logs;
                 } else if KeyCode::Char('k') == key.code {
@@ -72,10 +75,11 @@ fn restore_terminal(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result
     terminal.show_cursor().context("unable to show cursor")
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     intialize_logger();
     let mut terminal = setup_terminal().context("setup failed")?;
-    run(&mut terminal).unwrap();
+    run(&mut terminal).await.context("Error running")?;
     restore_terminal(&mut terminal).context("restore terminal failed")?;
     Ok(())
 }

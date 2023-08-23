@@ -10,6 +10,9 @@ anyhow = "1.0.72"
 crossterm = "0.26.1"
 log = "0.4.20"
 ratatui = { version = "0.22.0", features = ["all-widgets"] }
+sea-orm = { version = "0.12.2", features = ["macros", "runtime-tokio-rustls", "sqlx-sqlite"], default-features = false }
+sqlx-sqlite = "0.7.1"
+tokio = { version = "1.32.0", features = ["full"] }
 tui-logger = { version = "0.9.4", features = ["ratatui-support"] }
 
 [dev-dependencies.cargo-husky]
@@ -17,7 +20,3 @@ version = "1"
 default-features = false
 features = ["precommit-hook", "run-cargo-test", "run-cargo-clippy", "run-cargo-fmt", "run-cargo-check"]
 
-
-# [[bin]]
-# name="tui"
-# path="src/tui/main.rs"
