@@ -6,12 +6,12 @@ const DB_URL: &str = "sqlite://sqlite.db";
 
 pub async fn initialize_db() -> Result<(), DbErr> {
     let db = Database::connect(DB_URL).await?;
-    let hello_world = HelloWorld::find_by_id(1)
+    let test = Test::find_by_id(1)
         .one(&db)
         .await?
         .ok_or(DbErr::RecordNotFound(String::from("Hello World")))?;
-    log::info!("{}", hello_world.message);
-    log::trace!("{}", hello_world.something_else);
+    log::info!("{}", test.message);
+    log::info!("{}", test.count);
     db.close().await?;
     Ok(())
 }

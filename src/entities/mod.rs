@@ -2,4 +2,4 @@
 
 pub mod prelude;
 
-pub mod hello_world;
+pub mod test;
