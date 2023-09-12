@@ -66,6 +66,11 @@ This will also mean that the MainViewModel will mostly contain factory methods f
 
 The services will be owned by the service container and borrowed mutably as needed but will be hidden behind traits to enable unit testing.
 
+#### Routing
+- Main will get current route.
+- Based on the current route, it will get the needed services to pass to the MainViewMdoel factory method
+- Main will pass the MainViewModel to the View upon creation
+- CurrentViewModel must be destoryed before a new one can be created
 
 ### Technical Decisions
 
