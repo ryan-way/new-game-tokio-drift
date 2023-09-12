@@ -30,7 +30,7 @@ I've also decided on prinicple that projects that require a lot of processing ti
 
 
 ## Overview
-![overview](./docs/overview.svg)
+![overview](./docs/readme/overview.svg)
 
 **Simluate** - runs games without tui to allow for data gathering and assessing AI agents
 
@@ -46,7 +46,7 @@ I've also decided on prinicple that projects that require a lot of processing ti
 
 ### Play
 
-![play](./docs/play.svg)
+![play](./docs/readme/play.svg)
 
 #### Structure
 The structure will follow an MVVMish one. Views will contain the logic for displaying data from ViewModels. View Models will contain logic for preparing data for the view. and Models will come from services in external libraries.
@@ -89,7 +89,7 @@ The TUI framework that will be used in ratatui, as is the most popular.
 
 ## Implementation
 
-- **Phase 1 (Test)**
+- **Phase 1 (Counter)**
   - *goal:* to establish the base project structure for play game and ai
 - **Phase 2 (Tic Tac Toe Play)**
   - *goal:* build on the established project structure to implement tic tac toe game
