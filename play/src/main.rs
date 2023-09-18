@@ -42,6 +42,8 @@ async fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<(), Bo
 
     db::db_test().await?;
 
+    log::info!("Testing game logic: {}", game::count(1));
+
     loop {
         if show_logger {
             logger.draw(terminal);
