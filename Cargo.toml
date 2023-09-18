@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "db",
+    "game",
+    "ai",
+    "play",
+]
