@@ -12,9 +12,10 @@ use ratatui::{prelude::*, widgets::Paragraph, Terminal};
 use std::{error::Error, io::Stdout};
 use std::{io, time::Duration};
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     let mut terminal = setup_terminal()?;
-    run(&mut terminal)?;
+    run(&mut terminal).await?;
     restore_terminal(&mut terminal)?;
     Ok(())
 }
@@ -34,10 +35,13 @@ fn restore_terminal(
     Ok(terminal.show_cursor()?)
 }
 
-fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<(), Box<dyn Error>> {
+async fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<(), Box<dyn Error>> {
     logger::init_logger()?;
     let mut show_logger = false;
     let logger = views::logger::View::default();
+
+    db::db_test().await?;
+
     loop {
         if show_logger {
             logger.draw(terminal);
