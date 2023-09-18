@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 crossterm = "0.27.0"
+log = "0.4.20"
 ratatui = { version = "0.23.0", features = ["all-widgets"] }
+tui-logger = { version = "0.9.6", features = ["ratatui-support"] }

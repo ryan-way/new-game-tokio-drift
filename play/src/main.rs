@@ -1,3 +1,8 @@
+extern crate log;
+
+mod logger;
+mod views;
+
 use crossterm::{
     event::{self, Event, KeyCode},
     execute,
@@ -30,15 +35,28 @@ fn restore_terminal(
 }
 
 fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<(), Box<dyn Error>> {
+    logger::init_logger()?;
+    let mut show_logger = false;
+    let logger = views::logger::View::default();
     loop {
-        terminal.draw(|frame| {
-            let greeting = Paragraph::new("Hello World!");
-            frame.render_widget(greeting, frame.size());
-        })?;
+        if show_logger {
+            logger.draw(terminal);
+        } else {
+            terminal.draw(|frame| {
+                let greeting = Paragraph::new("Hello World!");
+                frame.render_widget(greeting, frame.size());
+            })?;
+        }
         if event::poll(Duration::from_millis(250))? {
             if let Event::Key(key) = event::read()? {
-                if KeyCode::Char('q') == key.code {
-                    break;
+                match key.code {
+                    KeyCode::Char(c) => match c {
+                        'q' => break,
+                        'l' => show_logger = !show_logger,
+                        'i' => log::info!("Logged from key press"),
+                        _ => log::error!("Invalid key press"),
+                    },
+                    _ => log::error!("Invalide Key Code type"),
                 }
             }
         }
