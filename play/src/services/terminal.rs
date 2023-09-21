@@ -1,4 +1,4 @@
-use crossterm::event::{self, Event, KeyCode};
+use crossterm::event::{self, Event};
 use crossterm::execute;
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
@@ -11,6 +11,7 @@ use std::io::Stdout;
 use std::time::Duration;
 
 use crate::views::MainView;
+
 pub struct Terminal {
     terminal: ratatui::Terminal<CrosstermBackend<Stdout>>,
 }
@@ -31,15 +32,13 @@ impl Terminal {
             })?;
             if event::poll(Duration::from_millis(250))? {
                 if let Event::Key(key) = event::read()? {
-                    match key.code {
-                        KeyCode::Char(c) => match c {
-                            'q' => break,
-                            _ => main_view.key_press(c),
-                        },
-                        _ => log::error!("Invalide Key Code type"),
-                    }
+                    main_view.handle_key(key.code);
                 }
             }
+            if main_view.should_quit() {
+                break;
+            }
+            main_view.route();
         }
         Ok(())
     }
@@ -50,3 +49,5 @@ impl Terminal {
         Ok(self.terminal.show_cursor()?)
     }
 }
+
+pub type Frame<'a> = ratatui::Frame<'a, CrosstermBackend<Stdout>>;
