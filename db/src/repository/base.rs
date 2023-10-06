@@ -5,7 +5,7 @@ use std::env;
 use std::error::Error;
 
 #[async_trait]
-pub trait Repository<M> {
+pub trait Repository<M>: Sync {
     async fn db(&self) -> Result<DatabaseConnection, Box<dyn Error>> {
         dotenv()?;
         let var = env::var("DATABASE_URL")?;
@@ -14,4 +14,5 @@ pub trait Repository<M> {
     }
 
     async fn first(&self) -> Result<M, Box<dyn Error>>;
+    async fn update(&self, model: &M) -> Result<(), Box<dyn Error>>;
 }

@@ -1,4 +1,4 @@
-pub fn count(value: usize) -> usize {
+pub fn count(value: i32) -> i32 {
     value + 1
 }
 

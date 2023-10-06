@@ -3,13 +3,13 @@ use crossterm::execute;
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
-// use ratatui::{backend::CrosstermBackend, Terminal};
 use ratatui::backend::CrosstermBackend;
 use std::error::Error;
 use std::io;
 use std::io::Stdout;
 use std::time::Duration;
 
+use crate::view_models::MainViewModel;
 use crate::views::MainView;
 
 pub struct Terminal {
@@ -25,20 +25,23 @@ impl Terminal {
         Ok(Self { terminal })
     }
 
-    pub fn run(&mut self, main_view: &mut MainView) -> Result<(), Box<dyn Error>> {
+    pub async fn run<'a>(
+        &mut self,
+        main_view: &mut MainView,
+        main_vm: &mut MainViewModel<'a>,
+    ) -> Result<(), Box<dyn Error>> {
         loop {
             self.terminal.draw(|frame| {
-                main_view.draw(frame);
+                main_view.draw(frame, main_vm);
             })?;
             if event::poll(Duration::from_millis(250))? {
                 if let Event::Key(key) = event::read()? {
-                    main_view.handle_key(key.code);
+                    main_view.handle_key(key.code, main_vm).await;
                 }
             }
             if main_view.should_quit() {
                 break;
             }
-            main_view.route();
         }
         Ok(())
     }

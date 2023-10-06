@@ -1,4 +1,4 @@
-use crate::services::Frame;
+use crate::terminal::Frame;
 use crossterm::event::KeyCode;
 use ratatui::{
     prelude::Rect,
@@ -63,9 +63,9 @@ impl MainMenuView {
         match self.state.selected() {
             Some(i) => match i {
                 0 => router.set_route(Route::Counter),
-                _ => log::info!("Ignoring selection: {}", i),
+                _ => log::warn!("Ignoring selection: {}", i),
             },
-            None => log::info!("Nothing Selected!"),
+            None => log::warn!("Nothing Selected!"),
         }
     }
 

@@ -64,6 +64,7 @@ A simple counter will be used to get end-to-end infrastructure setup. The schema
 | m   | minus one from count    |
 | s   | saves the current count |
 | l   | loads the count         |
+| r   | resets the count        |
 
 
 ## Implementation

@@ -1,15 +1,17 @@
 extern crate db;
+extern crate game;
 extern crate log;
 
 mod services;
-// mod view_models;
+mod terminal;
+mod view_models;
 mod views;
 
 use db::repository::Repository;
-use services::Terminal;
 use std::error::Error;
+use terminal::Terminal;
 
-// use crate::view_models::MainViewModel;
+use crate::view_models::MainViewModel;
 use crate::views::MainView;
 
 #[tokio::main]
@@ -19,10 +21,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let _ = repo.first().await?;
     log::info!("Testing game logic: {}", game::count(1));
 
-    // let mut main_viewmodel = MainViewModel::new(&mut repo);
-    let mut main_view = MainView::default();
+    let mut main_vm = MainViewModel::new(&repo);
+    let mut main_view = MainView::new();
     let mut terminal = Terminal::new()?;
-    terminal.run(&mut main_view)?;
+    terminal.run(&mut main_view, &mut main_vm).await?;
     terminal.restore()?;
     Ok(())
 }

@@ -1,6 +1,5 @@
+use crate::terminal::Frame;
 use crossterm::event::KeyCode;
-
-use crate::services::Frame;
 
 mod counter;
 mod logger;
@@ -8,7 +7,7 @@ mod main_menu;
 mod traits;
 
 use crate::services::{Route, Router};
-// use crate::view_models::MainViewModel;
+use crate::view_models::MainVm;
 
 use self::counter::CounterView;
 use self::logger::LoggerView;
@@ -17,84 +16,99 @@ use self::traits::View;
 
 pub struct MainView {
     router: Router,
-    current_view: Box<dyn View>,
+    counter: CounterView,
+    main_menu: MainMenuView,
+    logger: LoggerView,
     quit: bool,
 }
 
 impl MainView {
-    pub fn default() -> Self {
+    pub fn new() -> Self {
         Self {
             router: Router::default(),
-            current_view: Box::from(MainMenuView::new()),
+            counter: CounterView::new(),
+            main_menu: MainMenuView::new(),
+            logger: LoggerView::new(),
             quit: false,
         }
     }
 
-    pub fn draw(&mut self, f: &mut Frame) {
-        self.current_view.draw(f);
+    pub fn draw(&mut self, frame: &mut Frame, main_vm: &mut dyn MainVm) {
+        match self.router.route() {
+            Route::Counter => {
+                let counter_vm = main_vm.counter();
+                self.counter.draw(frame, counter_vm)
+            }
+            Route::MainMenu => self.main_menu.draw(frame),
+            Route::Logger => self.logger.draw(frame),
+        }
     }
 
-    pub fn handle_key(&mut self, code: KeyCode) {
+    pub async fn handle_key(&mut self, code: KeyCode, main_vm: &mut dyn MainVm) {
         match code {
             KeyCode::Char('q') => match self.router.route() {
                 Route::MainMenu => self.quit = true,
                 _ => self.router.set_route(Route::MainMenu),
             },
-            KeyCode::Char('l') => match self.router.route() {
+            KeyCode::Char('o') => match self.router.route() {
                 Route::Logger => self.router.previous(),
                 _ => self.router.set_route(Route::Logger),
             },
-            _ => {
-                self.current_view.handle_key(code, &mut self.router);
+            _ => self.routed_handle_key(code, main_vm).await,
+        }
+    }
+
+    async fn routed_handle_key(&mut self, code: KeyCode, main_vm: &mut dyn MainVm) {
+        match self.router.route() {
+            Route::Counter => {
+                let counter_vm = main_vm.counter();
+                self.counter
+                    .handle_key(code, counter_vm)
+                    .await
+                    .expect("Counter failed to handled key");
             }
+            Route::MainMenu => self.main_menu.handle_key(code, &mut self.router),
+            Route::Logger => self.logger.handle_key(code, &mut self.router),
         }
     }
 
     pub fn should_quit(&self) -> bool {
         self.quit
     }
-
-    pub fn route(&mut self) {
-        if self.router.should_reroute() {
-            self.current_view = match self.router.route() {
-                Route::Counter => Box::from(CounterView::new()),
-                Route::MainMenu => Box::from(MainMenuView::new()),
-                Route::Logger => Box::from(LoggerView::default()),
-            };
-            self.router.routed();
-        }
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::view_models::MockMainVm;
 
     mod when_created {
+
         use super::*;
 
         #[test]
         fn route_is_main_menu() {
-            let main_view = MainView::default();
+            let main_view = MainView::new();
 
             assert_eq!(main_view.router.route(), Route::MainMenu);
         }
     }
 
-    mod when_l_is_pressed {
+    mod when_o_is_pressed {
         use super::*;
 
-        #[test]
-        fn route_toggles_logger() {
-            let mut main_view = MainView::default();
+        #[tokio::test]
+        async fn route_toggles_logger() {
+            let mut mock = MockMainVm::new();
+            let mut main_view = MainView::new();
 
             assert_eq!(main_view.router.route(), Route::MainMenu);
 
-            main_view.handle_key(KeyCode::Char('l'));
+            main_view.handle_key(KeyCode::Char('o'), &mut mock).await;
 
             assert_eq!(main_view.router.route(), Route::Logger);
 
-            main_view.handle_key(KeyCode::Char('l'));
+            main_view.handle_key(KeyCode::Char('o'), &mut mock).await;
 
             assert_eq!(main_view.router.route(), Route::MainMenu);
         }
@@ -103,39 +117,41 @@ mod tests {
     mod when_q_is_pressed {
         use super::*;
 
-        #[test]
-        fn from_main_menu_then_quit() {
-            let mut main_view = MainView::default();
+        #[tokio::test]
+        async fn from_main_menu_then_quit() {
+            let mut mock = MockMainVm::new();
+            let mut main_view = MainView::new();
 
             assert_eq!(main_view.quit, false);
 
-            main_view.handle_key(KeyCode::Char('q'));
+            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
 
             assert_eq!(main_view.quit, true);
 
-            main_view.handle_key(KeyCode::Char('q'));
+            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
 
             assert_eq!(main_view.quit, true);
         }
 
-        #[test]
-        fn from_not_main_menu_return_then_quit() {
-            let mut main_view = MainView::default();
+        #[tokio::test]
+        async fn from_not_main_menu_return_then_quit() {
+            let mut mock = MockMainVm::new();
+            let mut main_view = MainView::new();
 
             assert_eq!(main_view.quit, false);
             assert_eq!(main_view.router.route(), Route::MainMenu);
 
-            main_view.handle_key(KeyCode::Char('l'));
+            main_view.handle_key(KeyCode::Char('o'), &mut mock).await;
 
             assert_eq!(main_view.quit, false);
             assert_eq!(main_view.router.route(), Route::Logger);
 
-            main_view.handle_key(KeyCode::Char('q'));
+            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
 
             assert_eq!(main_view.quit, false);
             assert_eq!(main_view.router.route(), Route::MainMenu);
 
-            main_view.handle_key(KeyCode::Char('q'));
+            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
 
             assert_eq!(main_view.quit, true);
         }

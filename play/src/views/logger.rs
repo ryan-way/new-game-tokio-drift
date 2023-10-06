@@ -2,13 +2,17 @@ use crossterm::event::KeyCode;
 use ratatui::style::{Color, Style};
 use tui_logger::TuiLoggerWidget;
 
-use crate::services::Frame;
-
 use super::traits::View;
 use crate::services::Router;
+use crate::terminal::Frame;
 
-#[derive(Default)]
 pub struct LoggerView;
+
+impl LoggerView {
+    pub fn new() -> Self {
+        Self
+    }
+}
 
 impl View for LoggerView {
     fn draw(&mut self, f: &mut Frame) {
