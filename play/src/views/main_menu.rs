@@ -1,12 +1,12 @@
-use crate::terminal::Frame;
-use crossterm::event::KeyCode;
+use crate::{terminal::Frame, utils::Command};
 use ratatui::{
     prelude::Rect,
     style::{Color, Modifier, Style},
     widgets::{Block, Borders, List, ListItem, ListState},
 };
 
-use crate::services::{Route, Router};
+use crate::services::Router;
+use crate::utils::Route;
 
 use super::traits::View;
 
@@ -92,12 +92,12 @@ impl View for MainMenuView {
         f.render_stateful_widget(list, self.size(f.size()), &mut self.state)
     }
 
-    fn handle_key(&mut self, code: KeyCode, router: &mut Router) {
-        match code {
-            KeyCode::Up => self.previous(),
-            KeyCode::Down => self.next(),
-            KeyCode::Enter => self.select(router),
-            KeyCode::Backspace => self.unselect(),
+    fn handle_key(&mut self, command: Command, router: &mut Router) {
+        match command {
+            Command::Up => self.previous(),
+            Command::Down => self.next(),
+            Command::Select => self.select(router),
+            Command::Unselect => self.unselect(),
             _ => log::warn!("Invalid keycode"),
         }
     }
@@ -145,7 +145,7 @@ mod tests {
             let mut router = Router::default();
             assert_eq!(main_menu.state.selected(), None);
 
-            main_menu.handle_key(KeyCode::Enter, &mut router);
+            main_menu.handle_key(Command::Select, &mut router);
             assert_eq!(router.route(), Route::MainMenu);
         }
     }
@@ -186,7 +186,7 @@ mod tests {
             let mut router = Router::default();
             main_menu.state.select(Some(0));
 
-            main_menu.handle_key(KeyCode::Enter, &mut router);
+            main_menu.handle_key(Command::Select, &mut router);
             assert_eq!(router.route(), Route::Counter);
         }
     }

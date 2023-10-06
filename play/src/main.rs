@@ -4,6 +4,7 @@ extern crate log;
 
 mod services;
 mod terminal;
+mod utils;
 mod view_models;
 mod views;
 

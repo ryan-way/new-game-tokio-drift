@@ -1,10 +1,4 @@
-#[derive(Default, Debug, PartialEq, Eq, Clone, Copy)]
-pub enum Route {
-    #[default]
-    MainMenu,
-    Counter,
-    Logger,
-}
+use crate::utils::Route;
 
 #[derive(Default, Clone, Copy)]
 pub struct Router {

@@ -36,7 +36,7 @@ impl Terminal {
             })?;
             if event::poll(Duration::from_millis(250))? {
                 if let Event::Key(key) = event::read()? {
-                    main_view.handle_key(key.code, main_vm).await;
+                    main_view.handle_key(key.code.into(), main_vm).await;
                 }
             }
             if main_view.should_quit() {

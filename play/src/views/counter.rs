@@ -1,10 +1,10 @@
 use ratatui::prelude::*;
 use std::error::Error;
 
-use crossterm::event::KeyCode;
 use ratatui::widgets::{Block, Borders, List, ListItem};
 
 use crate::terminal::Frame;
+use crate::utils::Command;
 use crate::view_models::CounterVm;
 
 pub struct CounterView;
@@ -39,30 +39,26 @@ impl CounterView {
 
     pub async fn handle_key(
         &self,
-        code: KeyCode,
+        command: Command,
         vm: &mut dyn CounterVm,
     ) -> Result<(), Box<dyn Error>> {
-        match code {
-            KeyCode::Char('s') => vm.save().await,
-            KeyCode::Char('l') => vm.load().await,
-            KeyCode::Char('a') => {
+        match command {
+            Command::Save => vm.save().await,
+            Command::Load => vm.load().await,
+            Command::Add => {
                 vm.add();
                 Ok(())
             }
-            KeyCode::Char('m') => {
+            Command::Minus => {
                 vm.minus();
                 Ok(())
             }
-            KeyCode::Char('r') => {
+            Command::Reset => {
                 vm.reset();
                 Ok(())
             }
-            KeyCode::Char(c) => {
-                log::error!("Counter View: unhandled key: {}", c);
-                Ok(())
-            }
-            _ => {
-                log::error!("Counter View: non char key detected");
+            c => {
+                log::error!("Counter View: Invalid Key: {:#?}", c);
                 Ok(())
             }
         }

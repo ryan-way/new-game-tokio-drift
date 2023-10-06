@@ -1,10 +1,10 @@
-use crossterm::event::KeyCode;
 use ratatui::style::{Color, Style};
 use tui_logger::TuiLoggerWidget;
 
 use super::traits::View;
 use crate::services::Router;
 use crate::terminal::Frame;
+use crate::utils::Command;
 
 pub struct LoggerView;
 
@@ -25,5 +25,5 @@ impl View for LoggerView {
 
         f.render_widget(logger, f.size());
     }
-    fn handle_key(&mut self, _code: KeyCode, _router: &mut Router) {}
+    fn handle_key(&mut self, _command: Command, _router: &mut Router) {}
 }

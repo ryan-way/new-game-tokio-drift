@@ -1,12 +1,13 @@
 use crate::terminal::Frame;
-use crossterm::event::KeyCode;
+use crate::utils::Command;
 
 mod counter;
 mod logger;
 mod main_menu;
 mod traits;
 
-use crate::services::{Route, Router};
+use crate::services::Router;
+use crate::utils::Route;
 use crate::view_models::MainVm;
 
 use self::counter::CounterView;
@@ -44,31 +45,31 @@ impl MainView {
         }
     }
 
-    pub async fn handle_key(&mut self, code: KeyCode, main_vm: &mut dyn MainVm) {
-        match code {
-            KeyCode::Char('q') => match self.router.route() {
+    pub async fn handle_key(&mut self, command: Command, main_vm: &mut dyn MainVm) {
+        match command {
+            Command::Quit => match self.router.route() {
                 Route::MainMenu => self.quit = true,
                 _ => self.router.set_route(Route::MainMenu),
             },
-            KeyCode::Char('o') => match self.router.route() {
+            Command::Logger => match self.router.route() {
                 Route::Logger => self.router.previous(),
                 _ => self.router.set_route(Route::Logger),
             },
-            _ => self.routed_handle_key(code, main_vm).await,
+            _ => self.routed_handle_key(command, main_vm).await,
         }
     }
 
-    async fn routed_handle_key(&mut self, code: KeyCode, main_vm: &mut dyn MainVm) {
+    async fn routed_handle_key(&mut self, command: Command, main_vm: &mut dyn MainVm) {
         match self.router.route() {
             Route::Counter => {
                 let counter_vm = main_vm.counter();
                 self.counter
-                    .handle_key(code, counter_vm)
+                    .handle_key(command, counter_vm)
                     .await
                     .expect("Counter failed to handled key");
             }
-            Route::MainMenu => self.main_menu.handle_key(code, &mut self.router),
-            Route::Logger => self.logger.handle_key(code, &mut self.router),
+            Route::MainMenu => self.main_menu.handle_key(command, &mut self.router),
+            Route::Logger => self.logger.handle_key(command, &mut self.router),
         }
     }
 
@@ -104,11 +105,11 @@ mod tests {
 
             assert_eq!(main_view.router.route(), Route::MainMenu);
 
-            main_view.handle_key(KeyCode::Char('o'), &mut mock).await;
+            main_view.handle_key(Command::Logger, &mut mock).await;
 
             assert_eq!(main_view.router.route(), Route::Logger);
 
-            main_view.handle_key(KeyCode::Char('o'), &mut mock).await;
+            main_view.handle_key(Command::Logger, &mut mock).await;
 
             assert_eq!(main_view.router.route(), Route::MainMenu);
         }
@@ -124,11 +125,11 @@ mod tests {
 
             assert_eq!(main_view.quit, false);
 
-            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
+            main_view.handle_key(Command::Quit, &mut mock).await;
 
             assert_eq!(main_view.quit, true);
 
-            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
+            main_view.handle_key(Command::Quit, &mut mock).await;
 
             assert_eq!(main_view.quit, true);
         }
@@ -141,17 +142,17 @@ mod tests {
             assert_eq!(main_view.quit, false);
             assert_eq!(main_view.router.route(), Route::MainMenu);
 
-            main_view.handle_key(KeyCode::Char('o'), &mut mock).await;
+            main_view.handle_key(Command::Logger, &mut mock).await;
 
             assert_eq!(main_view.quit, false);
             assert_eq!(main_view.router.route(), Route::Logger);
 
-            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
+            main_view.handle_key(Command::Quit, &mut mock).await;
 
             assert_eq!(main_view.quit, false);
             assert_eq!(main_view.router.route(), Route::MainMenu);
 
-            main_view.handle_key(KeyCode::Char('q'), &mut mock).await;
+            main_view.handle_key(Command::Quit, &mut mock).await;
 
             assert_eq!(main_view.quit, true);
         }
