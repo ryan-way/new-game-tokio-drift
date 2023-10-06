@@ -8,8 +8,6 @@ use ratatui::{
 use crate::services::Router;
 use crate::utils::Route;
 
-use super::traits::View;
-
 const NUM_ITEMS: usize = 3;
 pub struct MainMenuView {
     state: ListState,
@@ -79,10 +77,8 @@ impl MainMenuView {
             height,
         }
     }
-}
 
-impl View for MainMenuView {
-    fn draw(&mut self, f: &mut Frame) {
+    pub fn draw(&mut self, f: &mut Frame) {
         let list = List::new(self.list.map(ListItem::new))
             .block(Block::default().title("Main Menu").borders(Borders::ALL))
             .style(Style::default().fg(Color::White))
@@ -92,7 +88,7 @@ impl View for MainMenuView {
         f.render_stateful_widget(list, self.size(f.size()), &mut self.state)
     }
 
-    fn handle_key(&mut self, command: Command, router: &mut Router) {
+    pub fn handle_key(&mut self, command: Command, router: &mut Router) {
         match command {
             Command::Up => self.previous(),
             Command::Down => self.next(),

@@ -4,7 +4,6 @@ use crate::utils::Command;
 mod counter;
 mod logger;
 mod main_menu;
-mod traits;
 
 use crate::services::Router;
 use crate::utils::Route;
@@ -13,7 +12,6 @@ use crate::view_models::MainVm;
 use self::counter::CounterView;
 use self::logger::LoggerView;
 use self::main_menu::MainMenuView;
-use self::traits::View;
 
 pub struct MainView {
     router: Router,
